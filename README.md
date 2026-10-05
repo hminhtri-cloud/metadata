@@ -1,9 +1,8 @@
 # Metadata Analysis
 
-Standalone Flask application for **https://metadata.hminhtri.cloud/**. This
-folder is independent of the portfolio source. Its header, footer and
-light/dark theme use the same visual language as the main site; navigation
-links back to `www.hminhtri.cloud`.
+Standalone Flask application for **https://metadata.hminhtri.cloud/** with its
+own dark, signal-green visual identity. It has no navigation or branding tied
+to the portfolio. The portfolio project card opens this site in a new tab.
 
 ## Run locally
 

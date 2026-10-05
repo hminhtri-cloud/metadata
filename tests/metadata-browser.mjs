@@ -21,10 +21,10 @@ try {
   const page = await browser.newPage();
   await page.goto(url);
   assert.match(page.url(), /127\.0\.0\.1:5089\/$/);
-  assert.equal(await page.locator('.nav-logo').first().innerText(), 'SECPROFILE');
-  assert.match(await page.locator('body').evaluate(element => getComputedStyle(element).fontFamily), /Plus Jakarta Sans/);
-  await page.getByRole('button', {name: 'Toggle theme'}).click();
-  assert.equal(await page.locator('html').getAttribute('data-theme'), 'dark');
+  assert.match(await page.locator('.brand').innerText(), /metadata/);
+  assert.match(await page.locator('body').evaluate(element => getComputedStyle(element).fontFamily), /DM Sans/);
+  assert.equal(await page.locator('a[href*="hminhtri.cloud"]').count(), 0);
+  assert.equal(await page.getByRole('heading', {name: 'Your data. Decoded.'}).count(), 1);
   await page.setViewportSize({width: 390, height: 844});
   await page.getByRole('button', {name: 'Toggle navigation'}).click();
   assert.equal(await page.locator('#nav-links').isVisible(), true);
