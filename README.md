@@ -1,7 +1,7 @@
 # Metadata Analysis
 
 Standalone Flask application for **https://metadata.hminhtri.cloud/** with its
-own dark, signal-green visual identity. It has no navigation or branding tied
+own white-and-green visual identity. It has no navigation or branding tied
 to the portfolio. The portfolio project card opens this site in a new tab.
 
 ## Run locally
@@ -19,6 +19,24 @@ an **unzipped JSON export** from Facebook or Instagram using a browser that
 supports `webkitdirectory` (for example, Chrome or Edge). No uploaded files
 are sent to Flask, persisted or logged. Only matching JSON datasets are read;
 photos and other files are ignored. Refreshing the tab clears the results.
+
+The **Xem thử với dữ liệu Facebook** button loads a public, pre-analyzed
+dashboard generated from the site owner's real Facebook export. Visitors can
+explore the dashboard without downloading their own data. The public result
+includes search terms, activity titles, timestamps and aggregate trends; it
+does **not** include raw export files or media. This demo is intentionally
+public; only the visitor's own selected folder remains private on their device.
+The page also explains in Vietnamese how to download a Facebook JSON export
+through Accounts Center. HTML exports cannot be analyzed.
+
+To regenerate the demo from the owner's unzipped export (locally only):
+
+```bash
+node scripts/build-demo.mjs /path/to/unzipped-facebook-export
+```
+
+This updates `static/demo/facebook.json` using the same analysis engine as
+folder selection. The source folder must never be added to this repository.
 
 The browser reads up to 20 MiB per matching file and 50 MiB total. Invalid
 JSON or unexpected schemas are reported individually; other valid datasets

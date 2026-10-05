@@ -76,6 +76,14 @@ test('real Instagram export produces timestamped results without Facebook assump
   assert.equal(section(result, 'Followers').total, followers.filter(item => typeof item.string_list_data?.[0]?.timestamp === 'number').length);
 });
 
+test('public Facebook demo matches the current engine on the real sample export', async () => {
+  const demo = JSON.parse(await readFile(resolve(import.meta.dirname, '../static/demo/facebook.json'), 'utf8'));
+  const {demoSource, ...report} = demo;
+  assert.ok(demoSource);
+  assert.deepEqual(report, await run(fb, facebookPaths));
+  assert.equal(demo._buckets, undefined);
+});
+
 test('rejects wrong structure and malformed records while permitting partial data', () => {
   assert.equal(identify([{path: 'folder/../../logged_information/search/your_search_history.json'}]).matches.length, 0);
   assert.equal(identify([{path: 'folder/other/logged_information/search/your_search_history.json'}]).matches.length, 0);

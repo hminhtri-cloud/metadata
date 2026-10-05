@@ -3,6 +3,7 @@ import {identify, MAX_FILE, MAX_TOTAL, createResult, analyzeDataset, finalize} f
 const input = document.getElementById('metadata-folder');
 const selection = document.getElementById('metadata-selection');
 const button = document.getElementById('metadata-analyze');
+const demoButton = document.getElementById('metadata-demo');
 const status = document.getElementById('metadata-status');
 const error = document.getElementById('metadata-error');
 const results = document.getElementById('metadata-results');
@@ -65,7 +66,9 @@ function comparisonChart(comparison) {
 function render(report) {
   results.replaceChildren();
   const heading = node('div', 'metadata-result-heading');
-  heading.append(node('h2', '', `${report.platform} analysis`), node('p', '', `${format(report.datasets.length)} dataset files analyzed · Charts show real timestamped records`));
+  heading.append(node('h2', '', `${report.platform} analysis`), node('p', '', report.demoSource
+    ? `Public demo · Real results from ${format(report.datasets.length)} Facebook dataset files`
+    : `${format(report.datasets.length)} dataset files analyzed · Charts show real timestamped records`));
   results.append(heading);
   if (report.warnings.length) {
     const warnings = node('div', 'metadata-warnings');
@@ -147,7 +150,7 @@ input.addEventListener('change', () => {
 
 button.addEventListener('click', async () => {
   if (!chosen) return;
-  clear(); button.disabled = true; input.disabled = true;
+  clear(); button.disabled = true; demoButton.disabled = true; input.disabled = true;
   const {matches, platform} = chosen;
   const report = createResult(platform);
   try {
@@ -169,5 +172,29 @@ button.addEventListener('click', async () => {
     render(output);
     status.textContent = `Analysis complete: ${format(output.datasets.length)} dataset files processed.`;
   } catch (problem) { showError(problem.message || 'Analysis failed. Try selecting the folder again.'); status.textContent = ''; }
-  finally { input.disabled = false; button.disabled = false; }
+  finally { input.disabled = false; button.disabled = false; demoButton.disabled = false; }
+});
+
+demoButton.addEventListener('click', async () => {
+  clear(); chosen = null; selection.hidden = true; input.value = '';
+  button.disabled = true; demoButton.disabled = true; input.disabled = true;
+  try {
+    status.textContent = 'Loading public Facebook demo results';
+    const response = await fetch(demoButton.dataset.demoUrl);
+    if (!response.ok) throw new Error('Could not load the demo. Please try again later.');
+    const report = await response.json();
+    if (report.platform !== 'Facebook' || !Array.isArray(report.sections) || !report.sections.length || !report.demoSource) {
+      throw new Error('The demo data is unavailable. Please try again later.');
+    }
+    status.textContent = 'Preparing results';
+    await pause();
+    render(report);
+    status.textContent = 'Facebook demo loaded from real analysis results.';
+  } catch (problem) {
+    showError(problem.message || 'Network error while loading the demo.');
+    status.textContent = '';
+  } finally {
+    input.disabled = false;
+    demoButton.disabled = false;
+  }
 });

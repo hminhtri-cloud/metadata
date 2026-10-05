@@ -23,12 +23,22 @@ try {
   assert.match(page.url(), /127\.0\.0\.1:5089\/$/);
   assert.match(await page.locator('.brand').innerText(), /metadata/);
   assert.match(await page.locator('body').evaluate(element => getComputedStyle(element).fontFamily), /DM Sans/);
+  assert.equal(await page.locator('body').evaluate(element => getComputedStyle(element).backgroundColor), 'rgb(251, 253, 249)');
   assert.equal(await page.locator('a[href*="hminhtri.cloud"]').count(), 0);
   assert.equal(await page.getByRole('heading', {name: 'Your data. Decoded.'}).count(), 1);
+  assert.match(await page.locator('#tai-du-lieu').innerText(), /Trung tâm tài khoản/);
+  assert.match(await page.locator('#tai-du-lieu').innerText(), /JSON/);
   await page.setViewportSize({width: 390, height: 844});
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true);
   await page.getByRole('button', {name: 'Toggle navigation'}).click();
   assert.equal(await page.locator('#nav-links').isVisible(), true);
   await page.setViewportSize({width: 1280, height: 800});
+  await page.getByRole('button', {name: 'Xem thử với dữ liệu Facebook'}).click();
+  await page.getByRole('heading', {name: 'Facebook analysis'}).waitFor();
+  const demoStats = await page.locator('.metadata-stat').allInnerTexts();
+  assert.ok(demoStats.length > 3);
+  assert.match(await page.locator('.metadata-result-heading').innerText(), /Public demo/);
+  assert.ok(await page.locator('.metadata-chart').count() > 0);
   const samples = resolve(root, '../dllt/meta_data_analysis');
   for (const [folder, expected] of [
     ['facebook-huynhminhtri546767-16_08_2026-TOSLvCm2', 'Facebook analysis'],
@@ -39,6 +49,7 @@ try {
     await page.getByRole('heading', {name: expected}).waitFor({timeout: 90000});
     assert.ok(await page.locator('.metadata-chart').count() > 0);
     assert.match(await page.locator('#metadata-status').innerText(), /Analysis complete/);
+    if (expected === 'Facebook analysis') assert.deepEqual(await page.locator('.metadata-stat').allInnerTexts(), demoStats);
     console.log(`${folder}: dashboard rendered`);
   }
   temp = await mkdtemp(join(tmpdir(), 'metadata-e2e-'));
